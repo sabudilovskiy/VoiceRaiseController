@@ -8,6 +8,7 @@ struct DecibelListener : private sf::SoundRecorder {
     void Stop();
     double GetCurDecibel();
     using sf::SoundRecorder::getAvailableDevices;
+    ~DecibelListener() override;
    private:
     bool onProcessSamples(const sf::Int16 *samples, std::size_t sampleCount) override;
    private:

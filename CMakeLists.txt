@@ -1,29 +1,46 @@
 cmake_minimum_required(VERSION 3.27)
-project(VoiceRaiseController)
+include(CreatePart.cmake)
+project(VRC)
 
 set(CMAKE_CXX_STANDARD 20)
 include(FetchContent)
 
-##################
-####libraries#####
-##################
-FetchContent_Declare(hello_imgui GIT_REPOSITORY https://github.com/pthom/hello_imgui.git GIT_TAG master)
-FetchContent_MakeAvailable(hello_imgui)
-find_package(SFML COMPONENTS system window graphics CONFIG REQUIRED)
+#-----------------#
+#----libraries----#
+#-----------------#
+find_package(SFML COMPONENTS system window graphics audio CONFIG REQUIRED)
+find_package(ImGui-SFML CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(implot CONFIG REQUIRED)
+#----------------#
 
-##################
-#######src########
-##################
-add_library(${PROJECT_NAME}_src
-        src/DecibelListener.cpp
-        src/DecibelListener.hpp)
-target_link_libraries(${PROJECT_NAME}_src PRIVATE sfml-audio)
-##################
+#-----------------#
+#------audio------#
+#-----------------#
+CreateTrivialPart(
+        name "audio"
+        path "/src/audio"
+)
+IF(NOT WIN32)
+    target_link_libraries(${audio_module} PRIVATE "-framework OpenAL")
+ENDIF ()
+target_link_libraries(${audio_module} PRIVATE sfml-audio)
+#----------------#
 
-##################
+#----------------#
 #######GUI########
-##################
+#----------------#
+CreateTrivialPart(
+        name "gui"
+        path "/src/gui"
+)
+target_link_libraries(${gui_module} PRIVATE ImGui-SFML::ImGui-SFML)
 
-hello_imgui_add_app(${PROJECT_NAME}_gui main_gui.cpp)
-target_link_libraries(${PROJECT_NAME}_gui PRIVATE ${PROJECT_NAME}_src)
-target_include_directories(${PROJECT_NAME}_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+CreateTrivialExe(
+        name "main"
+        path "/src/app"
+)
+
+target_link_libraries(${main_exe} PRIVATE ${audio_module})
+target_link_libraries(${main_exe} PRIVATE ${gui_module})
+target_link_libraries(${main_exe} PRIVATE implot::implot)

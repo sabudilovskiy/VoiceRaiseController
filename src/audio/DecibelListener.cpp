@@ -4,6 +4,7 @@
 #include <span>
 #include <thread>
 #include <vector>
+#include <cmath>
 
 double calculateDecibels(std::span<const sf::Int16> samples)
 {
@@ -47,4 +48,8 @@ bool DecibelListener::onProcessSamples(const sf::Int16* samples,
 double DecibelListener::GetCurDecibel()
 {
     return db_.load(std::memory_order_acquire);
+}
+DecibelListener::~DecibelListener()
+{
+    stop();
 }
