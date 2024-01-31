@@ -47,10 +47,12 @@ struct MyApp : gui::App{
         if (im_hui::Button("Запустить запись") && selected_device != -1)
         {
             decibel_listener.Start(devices[selected_device]);
+            is_recording = true;
         }
-        if (im_hui::Button("Остановить запись"))
+        if (im_hui::Button("Остановить запись") && is_recording)
         {
             decibel_listener.Stop();
+            is_recording = false;
         }
     }
     void PlotDecibels(){
@@ -93,6 +95,9 @@ struct MyApp : gui::App{
         }
     }
     void UpdateDecibels(){
+        if (!is_recording){
+            return;
+        }
         double new_db = decibel_listener.GetCurDecibel() + 80;
         if (decibels_.size() >= 100)
         {
@@ -111,6 +116,7 @@ struct MyApp : gui::App{
     std::vector<float> decibels_;
     Notifier notifier;
     std::optional<std::chrono::steady_clock::time_point> start_notify = {};
+    bool is_recording{false};
 };
 int main()
 {

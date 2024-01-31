@@ -3,7 +3,7 @@
 #include <functional>
 #include <thread>
 
-struct DecibelListener : private sf::SoundRecorder {
+struct DecibelListener : protected sf::SoundRecorder {
     bool Start(const std::string& device);
     void Stop();
     double GetCurDecibel();
